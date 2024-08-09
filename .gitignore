@@ -1,0 +1,51 @@
+# IDE and editor files
+.ipynb_checkpoints
+/.idea/
+.DS_Store
+demo.py
+
+# Output and data files
+/outputs/
+/model/
+/runs/
+Link_classification/log/
+Link_classification/temp
+log/
+logs/
+bak/
+demo/
+data/output
+
+# Compressed and archived files
+*.gz
+*.gzip
+*.tgz
+*.bin
+*.log
+
+# Compiled code and configuration files
+*.pyc
+*.pkl
+
+# Text files
+*.html
+*.tsv
+*.xlsx
+*.csv
+*.jsonl
+*.zst
+
+
+# Machine learning and data analysis files
+*.pt
+*.gephi
+*.gexf
+
+
+# Python compiled files and cache
+cache/
+pycache/
+__pycache__/
+*/__pycache__/
+*/pycache/
+*.out

@@ -38,14 +38,18 @@ def nesting_inspection(org, grey, compos, ffl_block):
 
 
 def compo_detection(input_img_path, output_root, uied_params,
-                    resize_by_height=800, classifier=None, show=False, wai_key=0):
+                    resize_by_height: int=None, resize_by_width:int = None, classifier=None, show=False, wai_key=0):
 
-    start = time.clock()
+    assert resize_by_height is not None or resize_by_width is not None, "Please specify the resize length by height or width"
+
+    start = time.time()
     name = input_img_path.split('/')[-1][:-4] if '/' in input_img_path else input_img_path.split('\\')[-1][:-4]
     ip_root = file.build_directory(pjoin(output_root, "ip"))
 
     # *** Step 1 *** pre-processing: read img -> get binary map
-    org, grey = pre.read_img(input_img_path, resize_by_height)
+
+    org, grey = pre.read_img(input_img_path, resize_by_height, resize_by_width)
+
     binary = pre.binarization(org, grad_min=int(uied_params['min-grad']))
 
     # *** Step 2 *** element detection
@@ -88,4 +92,4 @@ def compo_detection(input_img_path, output_root, uied_params,
     # *** Step 7 *** save detection result
     Compo.compos_update(uicompos, org.shape)
     file.save_corners_json(pjoin(ip_root, name + '.json'), uicompos)
-    print("[Compo Detection Completed in %.3f s] Input: %s Output: %s" % (time.clock() - start, input_img_path, pjoin(ip_root, name + '.json')))
+    print("[Compo Detection Completed in %.3f s] Input: %s Output: %s" % (time.time() - start, input_img_path, pjoin(ip_root, name + '.json')))

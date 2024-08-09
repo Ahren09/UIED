@@ -132,7 +132,7 @@ def text_detection(input_file='../data/input/30800.jpg', output_file='../data/ou
     :param method: google or paddle
     :param paddle_model: the preload paddle model for paddle ocr
     '''
-    start = time.clock()
+    start = time.time()
     name = input_file.split('/')[-1][:-4]
     ocr_root = pjoin(output_file, 'ocr')
     img = cv2.imread(input_file)

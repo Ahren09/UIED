@@ -429,7 +429,8 @@ def component_detection(binary, min_obj_area,
 
                 mask_copy = mask.copy()
                 ff = cv2.floodFill(binary, mask, (j, i), None, 0, 0, cv2.FLOODFILL_MASK_ONLY)
-                if ff[0] < min_obj_area: continue
+                if ff[0] < min_obj_area:
+                    continue
                 mask_copy = mask - mask_copy
                 region = np.reshape(cv2.findNonZero(mask_copy[1:-1, 1:-1]), (-1, 2))
                 region = [(p[1], p[0]) for p in region]

@@ -4,12 +4,18 @@ from config.CONFIG_UIED import Config
 C = Config()
 
 
-def read_img(path, resize_height=None, kernel_size=None):
-
+def read_img(path, resize_height=None, resize_width=None, kernel_size=None):
+    assert resize_height <= 768 or resize_width <= 768, "The shortest side of the resized image length must be less than 768 pixels"
     def resize_by_height(org):
         w_h_ratio = org.shape[1] / org.shape[0]
         resize_w = resize_height * w_h_ratio
         re = cv2.resize(org, (int(resize_w), int(resize_height)))
+        return re
+
+    def resize_by_width(org):
+        w_h_ratio = org.shape[1] / org.shape[0]
+        resize_h = resize_width / w_h_ratio
+        re = cv2.resize(org, (int(resize_width), int(resize_h)))
         return re
 
     try:
@@ -19,8 +25,18 @@ def read_img(path, resize_height=None, kernel_size=None):
         if img is None:
             print("*** Image does not exist ***")
             return None, None
-        if resize_height is not None:
+
+        if resize_height is not None and resize_width is not None:
+            pass
+
+        elif resize_height is not None:
             img = resize_by_height(img)
+
+        elif resize_width is not None:
+            img = resize_by_width(img)
+
+        else:
+            raise ValueError("Please specify the resize length by height or width")
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         return img, gray
 

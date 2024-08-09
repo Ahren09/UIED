@@ -1,5 +1,6 @@
 import multiprocessing
 import glob
+import os
 import time
 import json
 from tqdm import tqdm
@@ -19,18 +20,24 @@ def resize_height_by_longest_edge(img_path, resize_length=800):
 
 
 if __name__ == '__main__':
-    # initialization
-    input_img_root = "E:/Mulong/Datasets/rico/combined"
-    output_root = "E:/Mulong/Result/rico/rico_uied/rico_new_uied_v3"
-    data = json.load(open('E:/Mulong/Datasets/rico/instances_test.json', 'r'))
+    PSTUTS_DIR = "/Users/yiqiaoj/Workspace/data/Multimodal/CVPR2020_PsTuts"
 
-    input_imgs = [pjoin(input_img_root, img['file_name'].split('/')[-1]) for img in data['images']]
-    input_imgs = sorted(input_imgs, key=lambda x: int(x.split('/')[-1][:-4]))  # sorted by index
+
+
+    # initialization
+    input_img_root = os.path.join(PSTUTS_DIR, 'screenshots', "0_0")
+    output_root = os.path.join(PSTUTS_DIR, 'screenshots_annotated', "0_0")
+    os.makedirs(output_root, exist_ok=True)
+
+    # data = json.load(open('E:/Mulong/Datasets/rico/instances_test.json', 'r'))
+
+
+    input_imgs = [os.path.join(input_img_root, image_name) for image_name in os.listdir(input_img_root)]
 
     key_params = {'min-grad': 10, 'ffl-block': 5, 'min-ele-area': 50, 'merge-contained-ele': True,
                   'max-word-inline-gap': 10, 'max-line-ingraph-gap': 4, 'remove-top-bar': True}
 
-    is_ip = False
+    is_ip = True
     is_clf = False
     is_ocr = False
     is_merge = True
@@ -52,12 +59,9 @@ if __name__ == '__main__':
     start_index = 30800  # 61728
     end_index = 100000
     for input_img in input_imgs:
+        image_name = os.path.basename(input_img)
+        image_name = ".".join(image_name.split('.')[:-1])
         resized_height = resize_height_by_longest_edge(input_img)
-        index = input_img.split('/')[-1][:-4]
-        if int(index) < start_index:
-            continue
-        if int(index) > end_index:
-            break
 
         if is_ocr:
             text.text_detection(input_img, output_root, show=False)
@@ -66,9 +70,14 @@ if __name__ == '__main__':
             ip.compo_detection(input_img, output_root, key_params,  classifier=compo_classifier, resize_by_height=resized_height, show=False)
 
         if is_merge:
-            import merge
-            compo_path = pjoin(output_root, 'ip', str(index) + '.json')
-            ocr_path = pjoin(output_root, 'ocr', str(index) + '.json')
-            merge.merge(input_img, compo_path, ocr_path, output_root, is_remove_top=key_params['remove-top-bar'], show=True)
+            from detect_merge import merge
+            compo_path = pjoin(output_root, 'ip', f'{image_name}.json')
+            ocr_path = pjoin(output_root, 'ocr', f'{image_name}.json')
+
+            os.makedirs(os.path.dirname(compo_path), exist_ok=True)
+            os.makedirs(os.path.dirname(ocr_path), exist_ok=True)
+
+            # merge.merge(input_img, compo_path, ocr_path, output_root, is_remove_top=key_params['remove-top-bar'], show=True)
+            merge.merge(input_img, compo_path, ocr_path, output_root, is_remove_bar=True, show=True)
 
         num += 1
